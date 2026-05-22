@@ -1,0 +1,23 @@
+# 클래스 이름 (주황색/굵게)
+Linker	KEYWORD1
+
+# 멤버 함수/메서드 이름 (갈색 또는 파란색)
+begin	KEYWORD2
+update	KEYWORD2
+
+onDataReceived	KEYWORD2
+
+isButtonUpdated	KEYWORD2
+getButtonId	KEYWORD2
+buttonRead	KEYWORD2
+
+isSwitchUpdated	KEYWORD2
+getSwitchId	KEYWORD2
+switchRead	KEYWORD2
+
+isSliderUpdated	KEYWORD2
+getSliderId	KEYWORD2
+sliderRead	KEYWORD2
+readData	KEYWORD2
+
+# 상수/매크로 이름 (파란색)
