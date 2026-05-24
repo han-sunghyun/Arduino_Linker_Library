@@ -66,6 +66,7 @@ void callback(int ch) {
     }
   }
 }
+
 void setup() {
   // linker.begin(RX, TX, 0, 9600);// RX, TX, channel, Baud Rate
   /*
@@ -75,7 +76,7 @@ void setup() {
 
   //=====================================
 
-  linker.begin(Serial1, 0, 9600);  // UART, channel, Baud Rate
+  // linker.begin(Serial1, 0, 9600);  // UART, channel, Baud Rate
   /*
   Arduino Mega2560(Serial1, Serial2, Serial3)
   Arduino Due(Serial1, Serial2, Serial3)
