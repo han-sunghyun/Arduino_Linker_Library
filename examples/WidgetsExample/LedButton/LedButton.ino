@@ -1,13 +1,29 @@
+/*
+ * Copyright 2026 [han-sunghyun]
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ */
+
 #include <Linker.h>
 
 #define TX 2
 #define RX 3
 
-#define LED_BUTTON_ID 0
+#define LED_R_BUTTON_ID 0
+#define LED_G_BUTTON_ID 1
+#define LED_B_BUTTON_ID 2
+
+#define LED_R_PIN 11
+#define LED_G_PIN 10
+#define LED_B_PIN 9
 
 Linker linker;
 
-ButtonStyleBuilder ledButton;
+ButtonStyleBuilder buttonStyle;
 
 String ledButtonStyle;
 
@@ -15,24 +31,42 @@ void callback(int ch) {
 
   if (linker.isButtonUpdated()) {
 
-    if (linker.getButtonId() == LED_BUTTON_ID) {
-
-      if (linker.buttonRead(LED_BUTTON_ID) == 0) {
-
-        digitalWrite(LED_BUILTIN, HIGH);
-
-        ledButtonStyle = ledButton.setId(LED_BUTTON_ID).setText("ON").setButtonColor("C2C2C2").build();
-        linker.write(ledButtonStyle);
-
-      } else {
-
-        digitalWrite(LED_BUILTIN, LOW);
-
-        ledButtonStyle = ledButton.setId(LED_BUTTON_ID).setText("OFF").setButtonColor("3D3D3D").build();
-        linker.write(ledButtonStyle);
-
-      }
+    switch (linker.getButtonId()) {
+      case LED_R_BUTTON_ID:
+        {
+          if (linker.buttonRead(LED_R_BUTTON_ID) == 0) {
+            digitalWrite(LED_R_PIN, HIGH);
+            ledButtonStyle = buttonStyle.setId(LED_R_BUTTON_ID).setText("ON").setButtonColor("FF0000").build();
+          } else {
+            digitalWrite(LED_R_PIN, LOW);
+            ledButtonStyle = buttonStyle.setId(LED_R_BUTTON_ID).setText("OFF").setButtonColor("990000").build();
+          }
+          break;
+        }
+      case LED_G_BUTTON_ID:
+        {
+          if (linker.buttonRead(LED_G_BUTTON_ID) == 0) {
+            digitalWrite(LED_G_PIN, HIGH);
+            ledButtonStyle = buttonStyle.setId(LED_G_BUTTON_ID).setText("ON").setButtonColor("00FF00").build();
+          } else {
+            digitalWrite(LED_G_PIN, LOW);
+            ledButtonStyle = buttonStyle.setId(LED_G_BUTTON_ID).setText("OFF").setButtonColor("009900").build();
+          }
+          break;
+        }
+      case LED_B_BUTTON_ID:
+        {
+          if (linker.buttonRead(LED_B_BUTTON_ID) == 0) {
+            digitalWrite(LED_B_PIN, HIGH);
+            ledButtonStyle = buttonStyle.setId(LED_B_BUTTON_ID).setText("ON").setButtonColor("0000FF").build();
+          } else {
+            digitalWrite(LED_B_PIN, LOW);
+            ledButtonStyle = buttonStyle.setId(LED_B_BUTTON_ID).setText("OFF").setButtonColor("000099").build();
+          }
+          break;
+        }
     }
+    linker.write(ledButtonStyle);
   }
 }
 
@@ -45,7 +79,7 @@ void setup() {
 
   //=====================================
 
-  // linker.begin(Serial1, 0, 9600);// UART, channel, Baud Rate
+  // linker.begin(Serial1, 0, 9600);  // UART, channel, Baud Rate
   /*
   Arduino Mega2560(Serial1, Serial2, Serial3)
   Arduino Due(Serial1, Serial2, Serial3)
@@ -72,7 +106,9 @@ void setup() {
 
   linker.onDataReceived(callback);
 
-  pinMode(LED_BUILTIN, OUTPUT);
+  pinMode(LED_R_PIN, OUTPUT);
+  pinMode(LED_G_PIN, OUTPUT);
+  pinMode(LED_B_PIN, OUTPUT);
 }
 
 void loop() {
