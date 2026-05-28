@@ -68,7 +68,7 @@ void Linker::begin(int uart_nr, int rx, int tx, int ch, long baud) {
 
 // [핵심 보정] 헤더 파일의 매크로 분기와 완벽하게 일치시킴으로써 PlatformIO 링커 에러 원천 차단!
 #if defined(LINKER_SUPPORT_CLASSIC_BT)
-void Linker::beginInternal(String deviceName, int ch) {
+void Linker::beginInternal(const char* deviceName, int ch) {
   if (ch >= 0 && ch < 3) {
     BluetoothSerial* btInternal = new BluetoothSerial();
     btInternal->begin(deviceName);
