@@ -25,47 +25,48 @@ Linker linker;
 
 ButtonStyleBuilder buttonStyle;
 
-String ledButtonStyle;
+String64 ledButtonStyle;
 
 void callback(int ch) {
 
   if (linker.isButtonUpdated()) {
+    int buttonId = linker.getButtonId();
+    int targetPin = -1;
+    char* buttonOnColor = "";
+    char* buttonOffColor = "";
 
-    switch (linker.getButtonId()) {
+    switch (buttonId) {
       case LED_R_BUTTON_ID:
         {
-          if (linker.buttonRead(LED_R_BUTTON_ID) == 0) {
-            digitalWrite(LED_R_PIN, HIGH);
-            ledButtonStyle = buttonStyle.setId(LED_R_BUTTON_ID).setText("ON").setButtonColor("FF0000").build();
-          } else {
-            digitalWrite(LED_R_PIN, LOW);
-            ledButtonStyle = buttonStyle.setId(LED_R_BUTTON_ID).setText("OFF").setButtonColor("990000").build();
-          }
+          targetPin = LED_R_PIN;
+          buttonOnColor = "FF0000";
+          buttonOffColor = "990000";
           break;
         }
       case LED_G_BUTTON_ID:
         {
-          if (linker.buttonRead(LED_G_BUTTON_ID) == 0) {
-            digitalWrite(LED_G_PIN, HIGH);
-            ledButtonStyle = buttonStyle.setId(LED_G_BUTTON_ID).setText("ON").setButtonColor("00FF00").build();
-          } else {
-            digitalWrite(LED_G_PIN, LOW);
-            ledButtonStyle = buttonStyle.setId(LED_G_BUTTON_ID).setText("OFF").setButtonColor("009900").build();
-          }
+          targetPin = LED_G_PIN;
+          buttonOnColor = "00FF00";
+          buttonOffColor = "009900";
           break;
         }
       case LED_B_BUTTON_ID:
         {
-          if (linker.buttonRead(LED_B_BUTTON_ID) == 0) {
-            digitalWrite(LED_B_PIN, HIGH);
-            ledButtonStyle = buttonStyle.setId(LED_B_BUTTON_ID).setText("ON").setButtonColor("0000FF").build();
-          } else {
-            digitalWrite(LED_B_PIN, LOW);
-            ledButtonStyle = buttonStyle.setId(LED_B_BUTTON_ID).setText("OFF").setButtonColor("000099").build();
-          }
+          targetPin = LED_B_PIN;
+          buttonOnColor = "0000FF";
+          buttonOffColor = "000099";
           break;
         }
     }
+
+    if (targetPin != -1) {
+      bool isOn = linker.buttonRead(buttonId) == 1;
+      const char* buttonText = isOn ? "ON" : "OFF";
+      const char* buttonColor = isOn ? buttonOnColor : buttonOffColor;
+      digitalWrite(targetPin, isOn);
+      buttonStyle.setId(buttonId).setText(buttonText).setButtonColor(buttonColor).build(ledButtonStyle, sizeof(ledButtonStyle));
+    }
+
     linker.write(ledButtonStyle);
   }
 }
