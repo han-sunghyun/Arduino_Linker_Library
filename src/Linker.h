@@ -16,6 +16,8 @@
 #include "SwitchBuilder.h"
 #include "SliderBulider.h"
 
+typedef char String64[64];
+
 // 1. SoftwareSerial 사용 여부 판별
 #if defined(ARDUINO_ARCH_AVR) || defined(ARDUINO_ARCH_RENESAS)
 #define LINKER_ENABLE_SOFTWARE_SERIAL
@@ -63,14 +65,14 @@ private:
   TaskHandle_t _taskHandle = NULL;
 #endif
 
-  String type = "";
+  char type[5] = "";
   int8_t id = 0;
-  String value = "";
+  char value[11] = "";
 
   void (*_onDataCallback)(int) = nullptr;
 
   void createTask();
-  void parse(String data, int streamCh);
+  void parse(char* data, int streamCh);
 
 public:
   Linker();
@@ -116,7 +118,7 @@ public:
   int sliderRead(int8_t slider_id);
 
 public:
-  void write(String value, int ch = 0);
+  void write(const char* value, int ch = 0);
 };
 
 #endif

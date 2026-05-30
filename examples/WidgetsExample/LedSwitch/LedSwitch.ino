@@ -1,38 +1,79 @@
+/*
+ * Copyright 2026 [han-sunghyun]
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ */
+
 #include <Linker.h>
 
-#define LED_SWITCH_ID 0
+#define TX 2
+#define RX 3
+
+#define LED_R_SWITCH_ID 0
+#define LED_G_SWITCH_ID 1
+#define LED_B_SWITCH_ID 2
+
+#define LED_R_PIN 11
+#define LED_G_PIN 10
+#define LED_B_PIN 9
 
 Linker linker;
 
-SwitchStyleBuilder ledSwitch;
-String ledSwitchStyle;
+SwitchStyleBuilder switchStyle;
+
+String64 switchStyleStr;
 
 void callback(int ch) {
+  if (!linker.isSwitchUpdated()) return;
 
-  if (linker.isSwitchUpdated()) {
+  int switchId = linker.getSwitchId();
+  int targetPin = -1;
+  const char* onColor = "000000";
+  const char* offColor = "000000";
 
-    if (linker.getSwitchId() == LED_SWITCH_ID) {
-
-      int switchState = linker.switchRead(LED_SWITCH_ID);
-
-      digitalWrite(LED_BUILTIN, switchState);
-
-      if (switchState) {
-
-        ledSwitchStyle = ledSwitch.setId(LED_SWITCH_ID).setValue(true).setSwitchColor("C2C2C2").build();
-        linker.write(ledSwitchStyle);
-
-      } else {
-
-        ledSwitchStyle = ledSwitch.setId(LED_SWITCH_ID).setValue(false).setSwitchColor("3D3D3D").build();
-        linker.write(ledSwitchStyle);
-        
+  switch (switchId) {
+    case LED_R_SWITCH_ID:
+      {
+        targetPin = LED_R_PIN;
+        onColor = "FF0000";
+        offColor = "990000";
+        break;
       }
-    }
+    case LED_G_SWITCH_ID:
+      {
+        targetPin = LED_G_PIN;
+        onColor = "00FF00";
+        offColor = "009900";
+        break;
+      }
+    case LED_B_SWITCH_ID:
+      {
+        targetPin = LED_B_PIN;
+        onColor = "0000FF";
+        offColor = "000099";
+        break;
+      }
+  }
+
+  if (targetPin != -1) {
+    bool isOn = (linker.switchRead(switchId) == 1);
+
+    digitalWrite(targetPin, isOn ? HIGH : LOW);
+
+    const char* activeColor = isOn ? onColor : offColor;
+    switchStyle.setId(switchId)
+      .setSwitchColor(activeColor)
+      .build(switchStyleStr, sizeof(switchStyleStr));
+
+    linker.write(switchStyleStr);
   }
 }
-void setup() {
 
+void setup() {
   // linker.begin(RX, TX, 0, 9600);// RX, TX, channel, Baud Rate
   /*
   Arduino Uno R3
@@ -50,7 +91,7 @@ void setup() {
 
   //=====================================
 
-  // linker.begin(1, 18, 17, 0, 9600);// UART, RX, TX, channel, Baud Rate
+  // linker.begin(18, 17, 0, 9600);// RX, TX, channel, Baud Rate (라이브러리 선언 구조에 맞춤)
   /*
   ESP32
   ESP32_S2(UART1 = 1)
@@ -68,8 +109,11 @@ void setup() {
 
   linker.onDataReceived(callback);
 
-  pinMode(LED_BUILTIN, OUTPUT);
+  pinMode(LED_R_PIN, OUTPUT);
+  pinMode(LED_G_PIN, OUTPUT);
+  pinMode(LED_B_PIN, OUTPUT);
 }
+
 void loop() {
   linker.update();
   /*

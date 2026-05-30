@@ -1,29 +1,54 @@
+/*
+ * Copyright 2026 [han-sunghyun]
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ */
+
 #include <Linker.h>
 
 #define TX 2
 #define RX 3
 
-#define SLIDER_ID 0
-#define PWM_LED 11
+#define LED_R_SLIDE_ID 0
+#define LED_G_SLIDE_ID 1
+#define LED_B_SLIDE_ID 2
+
+#define LED_R_PIN 11
+#define LED_G_PIN 10
+#define LED_B_PIN 9
 
 Linker linker;
-ButtonStyleBuilder number;
 
-int sliderValue = 0;
+SliderStyleBuilder sliderStyle;
+
+String64 sliderStyleStr;
 
 void callback(int ch) {
-
   if (linker.isSliderUpdated()) {
+    int slideId = linker.getSliderId();
+    int targetPin = -1;
 
-    if (linker.getSliderId() == SLIDER_ID) {
+    // 핀 번호만 매칭해줌
+    switch (slideId) {
+      case LED_R_SLIDE_ID: targetPin = LED_R_PIN; break;
+      case LED_G_SLIDE_ID: targetPin = LED_G_PIN; break;
+      case LED_B_SLIDE_ID: targetPin = LED_B_PIN; break;
+    }
 
-      sliderValue = linker.sliderRead(SLIDER_ID);
-
-      analogWrite(PWM_LED, sliderValue);
-
+    if (targetPin != -1) {
+      int value = linker.sliderRead(slideId);
+      
+      sliderStyle.setId(slideId).setText(value).build(sliderStyleStr, sizeof(sliderStyleStr));
+      analogWrite(targetPin, value);
+      linker.write(sliderStyleStr);
     }
   }
 }
+
 void setup() {
   // linker.begin(RX, TX, 0, 9600);// RX, TX, channel, Baud Rate
   /*
@@ -33,15 +58,36 @@ void setup() {
 
   //=====================================
 
-  // linker.begin(Serial1, 0, 9600);// UART, channel, Baud Rate
+  // linker.begin(Serial1, 0, 9600);  // UART, channel, Baud Rate
   /*
   Arduino Mega2560(Serial1, Serial2, Serial3)
   Arduino Due(Serial1, Serial2, Serial3)
   Arduino Uno R4(Serial1)
   */
-  
+
+  //=====================================
+
+  // linker.begin(18, 17, 0, 9600);// RX, TX, channel, Baud Rate (라이브러리 선언 구조에 맞춤)
+  /*
+  ESP32
+  ESP32_S2(UART1 = 1)
+  ESP32_S3(UART1 = 1, UART2 = 2)
+  ESP32_C2(UART1 = 1)
+  ESP32_C3(UART1 = 1)
+  */
+
+  //=====================================
+
+  // linker.beginInternal("MyESP32");// Name, channel
+  /*
+  ESP32
+  */
 
   linker.onDataReceived(callback);
+
+  pinMode(LED_R_PIN, OUTPUT);
+  pinMode(LED_G_PIN, OUTPUT);
+  pinMode(LED_B_PIN, OUTPUT);
 }
 
 void loop() {
